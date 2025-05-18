@@ -68,19 +68,29 @@ export default function WebSocketControls() {
         <p>Last timeStamp received: {lastTimeStampReceived}</p>
         {isRecieving ? (
           <div style={{ marginTop: "20px" }}>
-            <button onClick={stopReceiving} disabled={!isRecieving}>
+            <button
+              onClick={stopReceiving}
+              disabled={!isRecieving}
+              style={{ backgroundColor: "#920c0c" }}
+            >
               Stop
             </button>
           </div>
         ) : (
           <div style={{ marginTop: "20px" }}>
-            <button onClick={startReceiving} disabled={!isConnected}>
+            <button
+              onClick={startReceiving}
+              disabled={!isConnected}
+              style={{ backgroundColor: "#34920c" }}
+            >
               Start
             </button>
           </div>
         )}
       </div>
-      <div style={{ marginTop: "20px", textAlign: "left" }}>
+      <div
+        style={{ marginTop: "20px", marginBottom: "20px", textAlign: "left" }}
+      >
         <input
           id="vowelFilter"
           type="checkbox"
