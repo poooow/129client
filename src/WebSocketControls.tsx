@@ -17,22 +17,46 @@ export default function WebSocketControls() {
   useEffect(() => {
     if (!socket) return;
 
-    if (isRecieving) {
-      socket.onmessage = (event: MessageEvent) => {
-        const message = JSON.parse(event.data);
+    // Disable message receiving
+    if (!isRecieving) {
+      socket.onmessage = () => {};
+      return;
+    }
 
-        // Ignore messages with no content to show
-        if (!message.data && !message.timeStamp) return;
+    // Enable message receiving
+    socket.onmessage = (event: MessageEvent) => {
+      const message = JSON.parse(event.data) as DataRow;
 
+      /* Update data */
+      if (message.data) {
         setData((prevData) => {
-          message.receivedAt = new Date();
-          const newData = [...prevData, message];
+          if (!prevData.length) return []; // Timestamp not yet received
+
+          const newData = [...prevData];
+          const lastRow = { ...newData[newData.length - 1] };
+          lastRow.data = [...lastRow.data, ...message.data];
+          newData[newData.length - 1] = lastRow;
+          return newData;
+        });
+        /* Insert new timestamp */
+      } else if (message.timeStamp) {
+        setData((prevData) => {
+          const newData = [...prevData];
+
+          if (newData[newData.length - 1].data.length === 0) {
+            newData[newData.length - 1].timeStamp = message.timeStamp;
+          } else {
+            newData.push({
+              clientId: message.clientId,
+              timeStamp: message.timeStamp,
+              data: [],
+            });
+          }
+
           return newData.length > 20 ? newData.slice(1) : newData;
         });
-      };
-    } else {
-      socket.onmessage = () => {};
-    }
+      }
+    };
   }, [isRecieving]);
 
   const handleRowClick = (row: DataRow) => {
@@ -44,7 +68,7 @@ export default function WebSocketControls() {
   };
 
   const lastTimeStampReceived = datetimeToLocalTime(
-    data.find((item) => item.timeStamp)?.timeStamp
+    data[data.length - 1]?.timeStamp
   );
 
   return (
