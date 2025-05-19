@@ -43,7 +43,7 @@ export default function WebSocketControls() {
         setData((prevData) => {
           const newData = [...prevData];
 
-          if (newData[newData.length - 1].data.length === 0) {
+          if (newData.length && newData[newData.length - 1].data.length === 0) {
             newData[newData.length - 1].timeStamp = message.timeStamp;
           } else {
             newData.push({
